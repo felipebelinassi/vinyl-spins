@@ -27,6 +27,7 @@ export function ThemedText({
         type === 'subtitle' ? styles.subtitle : undefined,
         type === 'link' ? styles.link : undefined,
         style,
+        { padding: 0 }
       ]}
       {...rest}
     />
@@ -44,13 +45,15 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    lineHeight: 32,
+    fontSize: 30,
+    color: '#46443E',
+    fontFamily: 'Inter_700Bold',
   },
   subtitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    padding: 0,
+    fontSize: 14,
+    color: '#ABA7A5',
+    fontFamily: 'Inter_600SemiBold',
   },
   link: {
     lineHeight: 30,
