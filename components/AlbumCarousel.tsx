@@ -3,108 +3,113 @@ import { View, Text, Image, TouchableOpacity, StyleSheet, Dimensions } from 'rea
 import { FontAwesome } from '@expo/vector-icons';
 
 interface Album {
-  id: number
-  title: string
-  artist: string
-  coverUrl: string
-}
+  id: number;
+  title: string;
+  artist: string;
+  coverUrl: string;
+};
 
 interface AlbumCarouselProps {
-  albums?: Album[]
-  title?: string
+  albums?: Album[];
+  title?: string;
 }
 
-const { width } = Dimensions.get('window')
+const { width: windowWidth } = Dimensions.get('window');
 
-export default function AlbumCarousel({ albums = [], title = "New Arrivals" }: AlbumCarouselProps) {
-  const [activeIndex, setActiveIndex] = useState(0)
+export default function AlbumCarousel({ albums = [], title }: AlbumCarouselProps) {
+  const [activeIndex, setActiveIndex] = useState(0);
 
   const nextSlide = () => {
-    setActiveIndex((prevIndex) => (prevIndex + 1) % albums.length)
+    setActiveIndex((prevIndex) => (prevIndex + 1) % albums.length);
   }
 
   const prevSlide = () => {
-    setActiveIndex((prevIndex) => (prevIndex - 1 + albums.length) % albums.length)
+    setActiveIndex((prevIndex) => (prevIndex - 1 + albums.length) % albums.length);
   }
 
-  if (albums.length === 0) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.title}>{title}</Text>
-        <Text style={styles.noAlbums}>No albums available.</Text>
-      </View>
-    )
-  }
+  if (albums.length === 0) return null;
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>{title}</Text>
-      <View style={styles.carouselContainer}>
-        {albums.map((album, index) => {
-          let position = (index - activeIndex + albums.length) % albums.length
-          return (
-            <View
-              key={album.id}
-              style={[
-                styles.albumContainer,
-                {
-                  transform: [{ translateX: position === 0 ? 0 : position === 1 ? width * 0.25 : -width * 0.25 }],
-                  zIndex: position === 0 ? 10 : 5,
-                  opacity: position === 0 ? 1 : 0.7,
-                },
-                position === 0 ? styles.centerAlbum : styles.sideAlbum,
-                (position !== 0 && position !== 1 && position !== albums.length - 1) && styles.hiddenAlbum
-              ]}
-            >
-              <Image
-                source={{ uri: album.coverUrl }}
+    <>
+      {title ? <Text style={styles.title}>{title}</Text> : null}
+      <View style={styles.container}>
+        <View style={styles.carouselContainer}>
+          {albums.map((album, index) => {
+            let position = (index - activeIndex + albums.length) % albums.length;
+            const isCurrentAlbum = position === 0;
+            const isNextAlbum = position === 1;
+            const isPreviousAlbum = position === albums.length - 1;
+        
+            const albumCoverStyle = isCurrentAlbum ? styles.centerAlbum : 
+              (isNextAlbum || isPreviousAlbum) ? styles.sideAlbum :
+              styles.hiddenAlbum;
+
+            return (
+              <View
+                key={album.id}
                 style={[
-                  styles.albumCover,
-                  position === 0 ? styles.centerAlbumCover : styles.sideAlbumCover
+                  albumCoverStyle,
+                  styles.albumContainer,
+                  styles.boxShadow,
+                  {
+                    transform: [
+                      {
+                        translateX: isCurrentAlbum ? 0 :
+                          isNextAlbum ? windowWidth * 0.35 : 
+                          -windowWidth * 0.35 
+                      }
+                    ],
+                  },
                 ]}
-              />
-            </View>
-          )
-        })}
+              >
+                <Image
+                  source={{ uri: album.coverUrl }}
+                  style={[
+                    isCurrentAlbum ? styles.centerAlbumCover : styles.sideAlbumCover
+                  ]}
+                  blurRadius={isNextAlbum || isPreviousAlbum ? 1 : 0}
+                />
+              </View>
+            )
+          })}
+        </View>
         <TouchableOpacity style={[styles.navButton, styles.prevButton]} onPress={prevSlide}>
           <FontAwesome name='arrow-left'/>
         </TouchableOpacity>
         <TouchableOpacity style={[styles.navButton, styles.nextButton]} onPress={nextSlide}>
           <FontAwesome name='arrow-right'/>
         </TouchableOpacity>
+        <View style={styles.dotsContainer}>
+          {albums.map((_, index) => (
+            <View
+              key={index}
+              style={[
+                styles.dot,
+                index === activeIndex && styles.activeDot
+              ]}
+            />
+          ))}
+        </View>
       </View>
-      <View style={styles.dotsContainer}>
-        {albums.map((_, index) => (
-          <View
-            key={index}
-            style={[
-              styles.dot,
-              index === activeIndex && styles.activeDot
-            ]}
-          />
-        ))}
-      </View>
-    </View>
+    </>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    maxWidth: width,
+    maxWidth: windowWidth,
     alignItems: 'center',
   },
   title: {
-    fontSize: 24,
+    fontSize: 20,
+    marginBottom: 10,
     fontWeight: 'bold',
-    marginBottom: 16,
-  },
-  noAlbums: {
-    fontSize: 16,
-    textAlign: 'center',
+    fontFamily: "Inter_700Bold",
+    color: "#46443E",
   },
   carouselContainer: {
-    height: 320,
+    height: 350,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -112,30 +117,37 @@ const styles = StyleSheet.create({
     position: 'absolute',
     justifyContent: 'center',
     alignItems: 'center',
-    // transition: '300ms ease-in-out',
-  },
-  centerAlbum: {
-    zIndex: 10,
-  },
-  sideAlbum: {
-    zIndex: 5,
+    backgroundColor: 'white',
   },
   hiddenAlbum: {
     display: 'none',
   },
-  albumCover: {
-    borderRadius: 8,
+  centerAlbum: {
+    zIndex: 10,
+    opacity: 1,
+    shadowOpacity: 0.5,
   },
   centerAlbumCover: {
-    width: 256,
-    height: 256,
+    width: windowWidth * 0.7,
+    height: windowWidth * 0.7,
+  },
+  sideAlbum: {
+    zIndex: 5,
+    opacity: 0.5,
   },
   sideAlbumCover: {
-    width: 192,
-    height: 192,
-    opacity: 0.7,
+    width: windowWidth * 0.5,
+    height: windowWidth * 0.5,
+  },
+  boxShadow: {
+    shadowColor: 'rgba(0, 0, 0, 1)',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 1,
+    shadowRadius: 0,  
+    elevation: 5
   },
   navButton: {
+    zIndex: 22,
     position: 'absolute',
     top: '50%',
     marginTop: -20,
@@ -155,16 +167,16 @@ const styles = StyleSheet.create({
   dotsContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: 16,
   },
   dot: {
-    width: 8,
-    height: 8,
+    width: 5,
+    height: 5,
     borderRadius: 4,
-    backgroundColor: '#ccc',
-    marginHorizontal: 4,
+    backgroundColor: '#D0CCC8',
+    marginHorizontal: 6,
+    marginBottom: 35,
   },
   activeDot: {
-    backgroundColor: '#000',
+    backgroundColor: '#7B7371',
   },
 })

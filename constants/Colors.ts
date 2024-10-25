@@ -7,7 +7,7 @@ const tintColorLight = '#0a7ea4';
 
 const light = {
   text: '#11181C',
-  background: '#fff',
+  background: '#E8E4E1',
   tint: tintColorLight,
   icon: '#687076',
   tabBarBackground: '#D9D9D9',

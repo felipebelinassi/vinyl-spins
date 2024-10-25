@@ -19,7 +19,8 @@ export function DateHeader({ pageTitle = "Title" }: { pageTitle?: string }) {
 
 const styles = StyleSheet.create({
   content: {
-    paddingTop: 90,
+    paddingTop: 80,
+    paddingBottom: 45,
     padding: 32,
     gap: 0,
     overflow: 'hidden',
