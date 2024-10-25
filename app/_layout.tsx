@@ -31,8 +31,6 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      {/* TODO: Remove light bar*/}
-      {/* <StatusBar barStyle='light-content' backgroundColor={'#000'}/> */}
       <StatusBar barStyle='dark-content' backgroundColor={Colors[colorScheme].background}/>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
